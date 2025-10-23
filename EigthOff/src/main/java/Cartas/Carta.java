@@ -3,31 +3,24 @@ package Cartas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public abstract class Carta implements Comparable <Carta> {
+public abstract class Carta implements Comparable<Carta> {
 
     private int valor;
-    private String color;
-    private String figura;
+    protected Palo palo;
     private String ruta;
+    private boolean faceUp;
+    private String color;
 
-
-    public Carta(int valor, String figura, String color) {
+    public Carta(int valor, Palo palo, String color) {
         this.valor = valor;
-        this.figura = figura;
+        this.palo = palo;
         this.color = color;
         this.ruta = generarRuta();
+        this.faceUp = false;
     }
 
-
     private String generarRuta() {
-        String nombreFigura;
-        switch (figura) {
-            case "♥" -> nombreFigura = "Corazones";
-            case "♦" -> nombreFigura = "Diamantes";
-            case "♣" -> nombreFigura = "Treboles";
-            case "♠" -> nombreFigura = "Picas";
-            default -> nombreFigura = "";
-        }
+        String nombreFigura = palo.getPaloString();
 
         String nombreValor = switch (valor) {
             case 1 -> "As";
@@ -57,23 +50,36 @@ public abstract class Carta implements Comparable <Carta> {
     }
 
     public String getColor() {
-        return color;
+        return palo.getColor();
     }
 
     public String getFigura() {
-        return figura;
+        return palo.getFigura();
     }
 
+    public void makeFaceDown(){
+        faceUp = false;
+    }
+
+    public void makeFaceUp(){
+        faceUp = true;
+    }
+
+    public boolean isFaceUp(){
+        return faceUp;
+    }
+
+    @Override
     public int compareTo(Carta otraCarta) {
         if (this.valor != otraCarta.valor) {
             return Integer.compare(this.valor, otraCarta.valor);
         } else {
-            return this.figura.compareTo(otraCarta.figura);
+            return Integer.compare(this.palo.getPeso(), otraCarta.palo.getPeso());
         }
     }
 
     @Override
     public String toString() {
-        return valor + " " + figura + " " + color;
+        return valor + " " + palo.getFigura() + " " + palo.getColor();
     }
 }

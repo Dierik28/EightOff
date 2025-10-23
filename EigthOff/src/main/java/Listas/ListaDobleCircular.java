@@ -1,5 +1,8 @@
 package Listas;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class ListaDobleCircular <T> {
     private NodoDoble<T> inicio;
     private NodoDoble<T> fin;
@@ -129,6 +132,24 @@ public class ListaDobleCircular <T> {
             actual = actual.getNodoSig();
         } while (actual != inicio);
         return contador;
+    }
+
+    public void shuffle() {
+        if (estaVacia() || inicio == fin) return;
+
+        ArrayList<T> elementos = new ArrayList<>();
+        NodoDoble<T> actual = inicio;
+        do {
+            elementos.add(actual.getInfo());
+            actual = actual.getNodoSig();
+        } while (actual != inicio);
+
+        Collections.shuffle(elementos);
+
+        inicio = fin = null;
+        for (T dato : elementos) {
+            insertarFin(dato);
+        }
     }
 
     @Override
