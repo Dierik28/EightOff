@@ -1,3 +1,4 @@
+// Foundation.java - Modificado para Eight Off
 package Juego;
 
 import Cartas.Carta;
@@ -15,6 +16,7 @@ public class Foundation {
 
     public void agregarCarta(Carta carta) {
         pila.insertarFin(carta);
+        carta.makeFaceUp();
     }
 
     public Carta sacarCarta() {
@@ -22,6 +24,9 @@ public class Foundation {
     }
 
     public Carta verUltimaCarta() {
+        if (pila.estaVacia()) {
+            return null;
+        }
         return pila.getFinal();
     }
 
@@ -32,17 +37,21 @@ public class Foundation {
     public Palo getPalo() {
         return palo;
     }
+
     public int getSize(){
         return pila.getSize();
     }
 
     public boolean puedeAgregar(Carta carta) {
+
         if (!carta.getFigura().equals(palo.getFigura())) return false;
 
         if (estaVacia()) {
+
             return carta.getValor() == 1;
         } else {
             Carta ultima = verUltimaCarta();
+
             return carta.getValor() == ultima.getValor() + 1;
         }
     }
@@ -53,5 +62,13 @@ public class Foundation {
 
     public int tamaño() {
         return pila.getSize();
+    }
+
+    public boolean estaCompleta() {
+        return pila.getSize() == 13; // De As a Rey
+    }
+
+    public void clear() {
+        while(pila.eliminarFin() != null) {}
     }
 }

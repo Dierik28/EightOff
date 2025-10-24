@@ -1,30 +1,32 @@
+// Mazo.java - Modificado para Eight Off
 package Cartas;
 
 import Listas.ListaDobleCircular;
 
 public class Mazo {
-    private ListaDobleCircular <Carta> mazo;
+    private ListaDobleCircular<Carta> mazo;
 
     public Mazo() {
         mazo = new ListaDobleCircular<>();
-
+        llenar();
+        mezclar();
     }
 
     private void llenar() {
-        for (int i = 1; i <=13 ; i++) {
-            for (Palo palo : Palo.values()){
+        for (int i = 1; i <= 13; i++) {
+            for (Palo palo : Palo.values()) {
                 CartaInglesa carta = new CartaInglesa(i, palo, palo.getColor());
-                carta.makeFaceUp();
+                carta.makeFaceUp(); // En Eight Off, todas las cartas empiezan boca arriba
                 mazo.insertarFin(carta);
             }
         }
     }
 
-    private void mezclar(){
+    private void mezclar() {
         mazo.shuffle();
     }
 
-    public ListaDobleCircular <Carta> getMazo() {
+    public ListaDobleCircular<Carta> getMazo() {
         return mazo;
     }
 
@@ -32,4 +34,11 @@ public class Mazo {
         return mazo.eliminarInicio();
     }
 
+    public boolean estaVacio() {
+        return mazo.estaVacia();
+    }
+
+    public int cartasRestantes() {
+        return mazo.tamaño();
+    }
 }

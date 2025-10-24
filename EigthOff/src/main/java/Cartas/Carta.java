@@ -16,7 +16,7 @@ public abstract class Carta implements Comparable<Carta> {
         this.palo = palo;
         this.color = color;
         this.ruta = generarRuta();
-        this.faceUp = false;
+        this.faceUp = true;
     }
 
     private String generarRuta() {

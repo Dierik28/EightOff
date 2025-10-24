@@ -41,39 +41,38 @@ public class ListaSimple <T> {
     }
 
     public T eliminarFin(){
-        T dato;
-        if(inicio == null){
-            dato = null;
+        if (inicio == null) {
             System.out.println("Lista vacia");
-        }else{
-            if(inicio.getSiguiente() == null){
-                dato = inicio.getInfo();
-                inicio = null;
-            }else{
-                Nodo <T> r = inicio;
-                Nodo <T> a = r;
-                while(r.getSiguiente() != null){
-                    a = r;
-                    r = r.getSiguiente();
-                }
-                dato = r.getInfo();
-                a.setSiguiente(null);
-            }
+            return null;
         }
-        return dato;
+
+        if (inicio.getSiguiente() == null) {
+            T dato = inicio.getInfo();
+            inicio = null;
+            return dato;
+        } else {
+            Nodo<T> r = inicio;
+            Nodo<T> a = r;
+            while (r.getSiguiente() != null) {
+                a = r;
+                r = r.getSiguiente();
+            }
+            T dato = r.getInfo();
+            a.setSiguiente(null);
+            return dato;
+        }
     }
 
     public int getSize(){
-        Nodo <T> n = inicio;
+        if (inicio == null) {
+            return 0; // Retorna 0 si la lista está vacía
+        }
+
+        Nodo<T> n = inicio;
         int size = 1;
-        if(n == null){
-            System.out.println("Lista vacia");
-            size = 0;
-        }else{
-            while(n.getSiguiente() != null){
-                n = n.getSiguiente();
-                size++;
-            }
+        while (n.getSiguiente() != null) {
+            n = n.getSiguiente();
+            size++;
         }
         return size;
     }
@@ -83,14 +82,13 @@ public class ListaSimple <T> {
     }
 
     public T getFinal(){
-        Nodo <T> n = inicio;
-        if(inicio == null){
-            System.out.println("Lista vacia");
-            n = null;
-        }else{
-            while(n.getSiguiente() != null){
-                n = n.getSiguiente();
-            }
+        if (inicio == null) {
+            return null;
+        }
+
+        Nodo<T> n = inicio;
+        while (n.getSiguiente() != null) {
+            n = n.getSiguiente();
         }
         return n.getInfo();
     }
@@ -132,5 +130,7 @@ public class ListaSimple <T> {
         }
         return null;
     }
+
+
 
 }

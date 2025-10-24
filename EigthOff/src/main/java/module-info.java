@@ -1,4 +1,4 @@
-module com.example.eigthoff {
+module Juego {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -11,6 +11,6 @@ module com.example.eigthoff {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
-    opens com.example.eigthoff to javafx.fxml;
-    exports com.example.eigthoff;
+    opens Juego to javafx.fxml;
+    exports Juego;
 }

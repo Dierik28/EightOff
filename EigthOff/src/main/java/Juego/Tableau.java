@@ -3,11 +3,8 @@ package Juego;
 import Cartas.Carta;
 import Listas.ListaSimple;
 
-import java.util.Objects;
-
 public class Tableau {
     private final ListaSimple<Carta> cartas = new ListaSimple<>();
-    private final boolean soloRey = false;
 
     public int size() {
         return cartas.getSize();
@@ -19,6 +16,11 @@ public class Tableau {
 
     public Carta peek() {
         return cartas.getFinal();
+    }
+
+    public Carta getCarta(int i) {
+        if (i < 0 || i >= cartas.getSize()) return null;
+        return cartas.getPosicion(i);
     }
 
     public Carta pop() {
@@ -33,6 +35,7 @@ public class Tableau {
 
     public void pushInicial(Carta carta) {
         cartas.insertarFin(carta);
+        carta.makeFaceUp();
     }
 
     private boolean esMovimientoValido(Carta carta) {
@@ -40,15 +43,41 @@ public class Tableau {
 
         Carta top = peek();
         if (top == null) {
-            return !soloRey || carta.getValor() == 13;
+            return carta.getValor() == 13; // 13 = King (K)
         }
 
-        return Objects.equals(top.getFigura(), carta.getFigura()) && top.getValor() - 1 == carta.getValor();
+        boolean mismoPalo = top.getFigura().equals(carta.getFigura());
+        boolean ordenDescendente = top.getValor() == carta.getValor() + 1;
+
+        return mismoPalo && ordenDescendente;
+    }
+
+    public boolean esEscaleraValidaDesde(int i) {
+        int size = cartas.getSize();
+        if (size == 0 || i < 0 || i >= size - 1) return true;
+
+        for (int j = i; j < size - 1; j++) {
+            Carta actual = cartas.getPosicion(j);
+            Carta siguiente = cartas.getPosicion(j + 1);
+
+            boolean paloIgual = actual.getFigura().equals(siguiente.getFigura());
+            boolean valorDescendente = actual.getValor() == siguiente.getValor() + 1;
+
+            if (!(paloIgual && valorDescendente)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean puedoColocarCarta(Carta carta) {
+        return esMovimientoValido(carta);
     }
 
     public boolean push(Carta carta) {
         if (!esMovimientoValido(carta)) return false;
         cartas.insertarFin(carta);
+        carta.makeFaceUp();
         return true;
     }
 
@@ -56,24 +85,35 @@ public class Tableau {
         int n = run.getSize();
         if (n == 0) return false;
 
-        for (int i = 1; i < n; i++) {
-            Carta abajo = run.getPosicion(i - 1);
-            Carta arriba = run.getPosicion(i);
-            if (abajo.getFigura() != arriba.getFigura()) return false;
-            if (abajo.getValor() - 1 != arriba.getValor()) return false;
+        if (n == 1) {
+            return true;
+        }
+
+        for (int i = 0; i < n - 1; i++) {
+            Carta cartaActual = run.getPosicion(i);
+            Carta cartaSiguiente = run.getPosicion(i + 1);
+            if (!cartaActual.getFigura().equals(cartaSiguiente.getFigura())) {
+                return false;
+            }
+            if (cartaActual.getValor() != cartaSiguiente.getValor() + 1) {
+                return false;
+            }
         }
         return true;
     }
 
     public boolean puedoColocarEscalera(ListaSimple<Carta> run) {
         if (!escaleraValida(run)) return false;
-        return esMovimientoValido(run.getPosicion(0));
+        Carta primeraCarta = run.getPosicion(0);
+        return esMovimientoValido(primeraCarta);
     }
 
     public boolean pushEscalera(ListaSimple<Carta> run) {
         if (!puedoColocarEscalera(run)) return false;
         for (int i = 0; i < run.getSize(); i++) {
-            cartas.insertarFin(run.getPosicion(i));
+            Carta carta = run.getPosicion(i);
+            cartas.insertarFin(carta);
+            carta.makeFaceUp();
         }
         return true;
     }
@@ -101,7 +141,20 @@ public class Tableau {
 
     public void pushAllInicial(ListaSimple<Carta> run) {
         for (int i = 0; i < run.getSize(); i++) {
-            cartas.insertarFin(run.getPosicion(i));
+            Carta carta = run.getPosicion(i);
+            cartas.insertarFin(carta);
+            carta.makeFaceUp();
         }
+    }
+
+    public ListaSimple<Carta> getCartasVisibles() {
+        ListaSimple<Carta> visibles = new ListaSimple<>();
+        for (int i = 0; i < cartas.getSize(); i++) {
+            Carta carta = cartas.getPosicion(i);
+            if (carta.isFaceUp()) {
+                visibles.insertarFin(carta);
+            }
+        }
+        return visibles;
     }
 }
