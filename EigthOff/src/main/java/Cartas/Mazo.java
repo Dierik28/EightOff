@@ -11,7 +11,7 @@ public class Mazo {
     }
 
     private void llenar() {
-        for (int i = 2; i <=14 ; i++) {
+        for (int i = 1; i <=13 ; i++) {
             for (Palo palo : Palo.values()){
                 CartaInglesa carta = new CartaInglesa(i, palo, palo.getColor());
                 carta.makeFaceUp();
@@ -26,6 +26,10 @@ public class Mazo {
 
     public ListaDobleCircular <Carta> getMazo() {
         return mazo;
+    }
+
+    public Carta sacarCarta() {
+        return mazo.eliminarInicio();
     }
 
 }
