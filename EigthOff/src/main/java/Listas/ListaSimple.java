@@ -3,16 +3,25 @@ package Listas;
 public class ListaSimple <T> {
     private Nodo<T> inicio;
 
+    /**
+     * Crea una lista simplemente enlazada vacía
+     */
     public ListaSimple() {
         this.inicio = null;
     }
 
+    /**
+     * Agrega un elemento al inicio de la lista
+     */
     public void insertarInicio (T dato){
         Nodo <T> n = new Nodo(dato);
         n.setSiguiente(inicio);
         inicio = n;
     }
 
+    /**
+     * Agrega un elemento al final de la lista
+     */
     public void insertarFin(T dato){
         Nodo <T> n = new Nodo(dato);
         if(inicio == null){
@@ -28,18 +37,9 @@ public class ListaSimple <T> {
         }
     }
 
-    public T eliminarInicio(){
-        T dato;
-        if(inicio == null){
-            dato = null;
-            System.out.println("Lista vacia");
-        }else{
-            dato = inicio.getInfo();
-            inicio = inicio.getSiguiente();
-        }
-        return dato;
-    }
-
+    /**
+     * Elimina y devuelve el último elemento de la lista
+     */
     public T eliminarFin(){
         if (inicio == null) {
             System.out.println("Lista vacia");
@@ -63,9 +63,12 @@ public class ListaSimple <T> {
         }
     }
 
+    /**
+     * Devuelve la cantidad de elementos en la lista
+     */
     public int getSize(){
         if (inicio == null) {
-            return 0; // Retorna 0 si la lista está vacía
+            return 0;
         }
 
         Nodo<T> n = inicio;
@@ -77,10 +80,9 @@ public class ListaSimple <T> {
         return size;
     }
 
-    public T getInicio() {
-        return inicio.getInfo();
-    }
-
+    /**
+     * Obtiene el último elemento de la lista
+     */
     public T getFinal(){
         if (inicio == null) {
             return null;
@@ -93,30 +95,16 @@ public class ListaSimple <T> {
         return n.getInfo();
     }
 
-    public T peekInicio() {
-        return inicio != null ? inicio.getInfo() : null;
-    }
-
-    public T peekFin() {
-        if (inicio == null) return null;
-        Nodo<T> n = inicio;
-        while (n.getSiguiente() != null) n = n.getSiguiente();
-        return n.getInfo();
-    }
-
+    /**
+     * Verifica si la lista está vacía
+     */
     public boolean estaVacia() {
         return inicio == null;
     }
 
-    public void recorrerLista() {
-        Nodo<T> n = inicio;
-        while(n != null) {
-            System.out.print(n.getInfo() + " ");
-            n = n.getSiguiente();
-        }
-        System.out.println("null");
-    }
-
+    /**
+     * Obtiene el elemento en una posición específica
+     */
     public T getPosicion(int pos) {
         if (pos < 0 || pos >= getSize()) return null;
         Nodo<T> n = inicio;
@@ -130,7 +118,4 @@ public class ListaSimple <T> {
         }
         return null;
     }
-
-
-
 }

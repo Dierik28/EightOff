@@ -7,28 +7,18 @@ public class ListaDobleCircular <T> {
     private NodoDoble<T> inicio;
     private NodoDoble<T> fin;
 
+    /**
+     * Crea una lista doble circular vacía
+     */
     public ListaDobleCircular() {
         this.inicio = null;
         this.fin = null;
     }
 
-    public void insertarInicio(T dato) {
-        NodoDoble<T> nodo = new NodoDoble<>();
-        nodo.setInfo(dato);
-
-        if (estaVacia()) {
-            inicio = fin = nodo;
-            nodo.setNodoSig(inicio);
-            nodo.setNodoAnt(inicio);
-        } else {
-            nodo.setNodoSig(inicio);
-            inicio.setNodoAnt(nodo);
-            inicio = nodo;
-            fin.setNodoSig(inicio);
-            nodo.setNodoAnt(fin);
-        }
-    }
-
+    /**
+     * Agrega un elemento al final de la lista
+     * Si está vacía, crea el primer nodo que apunta a sí mismo
+     */
     public void insertarFin(T dato) {
         NodoDoble<T> nodo = new NodoDoble<>();
         nodo.setInfo(dato);
@@ -45,25 +35,9 @@ public class ListaDobleCircular <T> {
         }
     }
 
-    public T eliminarInicio() {
-        T dato = null;
-
-        if (estaVacia()) {
-            System.out.println("Lista vacia");
-        } else {
-            if (inicio == fin) {
-                dato = inicio.getInfo();
-                inicio = fin = null;
-            } else {
-                dato = inicio.getInfo();
-                fin.setNodoSig(inicio.getNodoSig());
-                inicio = inicio.getNodoSig();
-                inicio.setNodoAnt(fin);
-            }
-        }
-        return dato;
-    }
-
+    /**
+     * Elimina y devuelve el último elemento de la lista
+     */
     public T eliminarFin() {
         T dato = null;
         if (estaVacia()) {
@@ -83,57 +57,17 @@ public class ListaDobleCircular <T> {
         return dato;
     }
 
+    /**
+     * Verifica si la lista está vacía
+     */
     public boolean estaVacia() {
         return inicio == null;
     }
 
-    public NodoDoble<T> getInicio() {
-        return inicio;
-    }
-
-    public NodoDoble<T> getFin() {
-        return fin;
-    }
-
-    public void recorrerLista() {
-        if (inicio == null) {
-            System.out.println("Lista vacía.");
-            return;
-        }
-
-        NodoDoble<T> actual = inicio;
-        System.out.println("Contenido de la lista:");
-
-        do {
-            System.out.println(" " + actual.getInfo());
-            actual = actual.getNodoSig();
-        } while (actual != inicio);
-
-    }
-
-    public NodoDoble<T> buscar(T dato) {
-        if (estaVacia()) return null;
-        NodoDoble<T> actual = inicio;
-        do {
-            if (actual.getInfo().equals(dato)) {
-                return actual;
-            }
-            actual = actual.getNodoSig();
-        } while (actual != inicio);
-        return null;
-    }
-
-    public int tamaño() {
-        if (estaVacia()) return 0;
-        int contador = 0;
-        NodoDoble<T> actual = inicio;
-        do {
-            contador++;
-            actual = actual.getNodoSig();
-        } while (actual != inicio);
-        return contador;
-    }
-
+    /**
+     * Mezcla aleatoriamente los elementos de la lista
+     * Convierte a ArrayList, usa Collections.shuffle y reconstruye la lista
+     */
     public void shuffle() {
         if (estaVacia() || inicio == fin) return;
 
@@ -152,6 +86,9 @@ public class ListaDobleCircular <T> {
         }
     }
 
+    /**
+     * Muestra la lista como texto
+     */
     @Override
     public String toString() {
         if (estaVacia()) {
@@ -167,6 +104,5 @@ public class ListaDobleCircular <T> {
 
         sb.append("(inicio)");
         return sb.toString();
-
     }
 }

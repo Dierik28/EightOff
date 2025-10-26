@@ -1,0 +1,31 @@
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="Juego.PantallaInicioController"
+            prefWidth="1920" prefHeight="1080"
+            style="-fx-background-image: url('/imagenes/fondo.png');
+                   -fx-background-size: cover;
+                   -fx-background-position: center;">
+
+
+    <!-- Título -->
+    <Label fx:id="tituloJuego" text="EIGHT  OFF"
+           layoutX="600" layoutY="500"
+           style="-fx-font-family: 'BenguiatStd-BookCondensedItalic';
+              -fx-font-size: 150px;
+              -fx-font-weight: normal;
+              -fx-text-fill: #d0a933;" />
+
+
+
+    <!-- Botón Jugar -->
+    <Button fx:id="botonJugar" text="Jugar"
+            layoutX="720" layoutY="800" prefWidth="200" prefHeight="80"
+            onAction="#jugar" />
+
+    <!-- Botón Salir -->
+    <Button fx:id="botonSalir" text="Salir"
+            layoutX="1000" layoutY="800" prefWidth="200" prefHeight="80"
+            onAction="#salir" />
+</AnchorPane>

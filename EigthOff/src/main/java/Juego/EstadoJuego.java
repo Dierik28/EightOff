@@ -4,20 +4,26 @@ import Cartas.Carta;
 
 public class EstadoJuego {
 
+    // Tipos de movimientos posibles en el juego
     public enum Tipo {TT, TF, FT, FF, TC, CT, CF, FC}
 
+    // Orígenes y destinos posibles para los movimientos
     public enum OrigenDestino {TABLEAU, FOUNDATION, FREE_CELL}
 
+    // Atributos de la clase
     public final Tipo tipo;
     public final OrigenDestino from, to;
     public final int fromIdx, toIdx;
     public final Carta carta;
     public int cantidad = 0;
 
+    /**
+     * Crea un estado de juego para un movimiento simple
+     */
     public EstadoJuego(Tipo tipo,
-                              OrigenDestino from, int fromIdx,
-                              OrigenDestino to, int toIdx,
-                              Carta carta) {
+                       OrigenDestino from, int fromIdx,
+                       OrigenDestino to, int toIdx,
+                       Carta carta) {
         this.tipo = tipo;
         this.fromIdx = fromIdx;
         this.toIdx = toIdx;
@@ -26,10 +32,13 @@ public class EstadoJuego {
         this.to = to;
     }
 
+    /**
+     * Crea un estado de juego para movimientos con múltiples cartas
+     */
     public EstadoJuego(Tipo tipo,
-                              OrigenDestino from, int fromIdx,
-                              OrigenDestino to, int toIdx,
-                              Carta carta, int cantidad) {
+                       OrigenDestino from, int fromIdx,
+                       OrigenDestino to, int toIdx,
+                       Carta carta, int cantidad) {
         this.tipo = tipo;
         this.fromIdx = fromIdx;
         this.toIdx = toIdx;
@@ -39,68 +48,78 @@ public class EstadoJuego {
         this.cantidad = cantidad;
     }
 
-    public static EstadoJuego tt(int from, int to, Carta carta) {
-        return new EstadoJuego(Tipo.TT,
-                OrigenDestino.TABLEAU, from,
-                OrigenDestino.TABLEAU, to, carta);
-    }
-
+    /**
+     * Movimiento de Tableau a Tableau
+     */
     public static EstadoJuego tt(int from, int to, Carta carta, int cantidad) {
         return new EstadoJuego(Tipo.TT,
                 OrigenDestino.TABLEAU, from,
                 OrigenDestino.TABLEAU, to, carta, cantidad);
     }
 
+    /**
+     * Movimiento de Tableau a Foundation
+     */
     public static EstadoJuego tf(int fromTableau, int toFoundation, Carta carta) {
         return new EstadoJuego(Tipo.TF,
                 OrigenDestino.TABLEAU, fromTableau,
                 OrigenDestino.FOUNDATION, toFoundation, carta);
     }
 
+    /**
+     * Movimiento de Foundation a Tableau
+     */
     public static EstadoJuego ft(int fromFoundation, int toTableau, Carta carta) {
         return new EstadoJuego(Tipo.FT,
                 OrigenDestino.FOUNDATION, fromFoundation,
                 OrigenDestino.TABLEAU, toTableau, carta);
     }
 
-    public static EstadoJuego ff(int fromFoundation, int toFoundation, Carta carta) {
-        return new EstadoJuego(Tipo.FF,
-                OrigenDestino.FOUNDATION, fromFoundation,
-                OrigenDestino.FOUNDATION, toFoundation, carta);
-    }
-
+    /**
+     * Movimiento de Tableau a FreeCell
+     */
     public static EstadoJuego tc(int fromTableau, int toFreeCell, Carta carta) {
         return new EstadoJuego(Tipo.TC,
                 OrigenDestino.TABLEAU, fromTableau,
                 OrigenDestino.FREE_CELL, toFreeCell, carta);
     }
 
+    /**
+     * Movimiento de FreeCell a Tableau
+     */
     public static EstadoJuego ct(int fromFreeCell, int toTableau, Carta carta) {
         return new EstadoJuego(Tipo.CT,
                 OrigenDestino.FREE_CELL, fromFreeCell,
                 OrigenDestino.TABLEAU, toTableau, carta);
     }
 
+    /**
+     * Movimiento de FreeCell a Foundation
+     */
     public static EstadoJuego cf(int fromFreeCell, int toFoundation, Carta carta) {
         return new EstadoJuego(Tipo.CF,
                 OrigenDestino.FREE_CELL, fromFreeCell,
                 OrigenDestino.FOUNDATION, toFoundation, carta);
     }
 
+    /**
+     * Movimiento de Foundation a FreeCell
+     */
     public static EstadoJuego fc(int fromFoundation, int toFreeCell, Carta carta) {
         return new EstadoJuego(Tipo.FC,
                 OrigenDestino.FOUNDATION, fromFoundation,
                 OrigenDestino.FREE_CELL, toFreeCell, carta);
     }
 
+    // Getters de la clase
     public Tipo getTipo() { return tipo; }
-    public OrigenDestino getFrom() { return from; }
-    public OrigenDestino getTo() { return to; }
     public int getFromIdx() { return fromIdx; }
     public int getToIdx() { return toIdx; }
-    public Carta getCarta() { return carta; }
     public int getCantidad() { return cantidad; }
 
+    /**
+     * Representación en texto del movimiento para debugging
+     */
     @Override
     public String toString() {
         String fromStr = from.toString() + "[" + fromIdx + "]";

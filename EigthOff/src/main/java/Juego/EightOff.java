@@ -12,6 +12,9 @@ public class EightOff {
     public final Foundation[] foundations;
     private final ListaSimple<EstadoJuego> undo;
 
+    /**
+     * Crea el juego Eight Off con mazo, tablero, celdas libres y fundaciones
+     */
     public EightOff() {
         mazo = new Mazo();
         tablero = new Tableau[8];
@@ -21,6 +24,9 @@ public class EightOff {
         iniciarComponentes();
     }
 
+    /**
+     * Inicializa todos los componentes del juego vacíos
+     */
     public void iniciarComponentes() {
         for (int i = 0; i < tablero.length; i++) tablero[i] = new Tableau();
         for (int i = 0; i < celdaLibres.length; i++) celdaLibres[i] = new CeldaLibre();
@@ -28,6 +34,9 @@ public class EightOff {
         for (int i = 0; i < 4; i++) foundations[i] = new Foundation(ordenPalos[i]);
     }
 
+    /**
+     * Limpia todos los componentes del juego para empezar de nuevo
+     */
     public void limpiarComponentes() {
         for (Tableau t : tablero) t.clear();
         for (CeldaLibre fc : celdaLibres) while (fc.sacarCarta(0) != null) {}
@@ -35,6 +44,9 @@ public class EightOff {
         while (undo.eliminarFin() != null) {}
     }
 
+    /**
+     * Mueve carta del tableau a celda libre
+     */
     public boolean moverTableauAFreeCell(int fromTableau, int toFreeCell) {
         if (!validarIndices(fromTableau, toFreeCell, 8, 8)) return false;
         Carta c = tablero[fromTableau].peek();
@@ -47,6 +59,9 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve carta de celda libre al tableau
+     */
     public boolean moverFreeCellATableau(int fromFreeCell, int toTableau) {
         if (!validarIndices(fromFreeCell, toTableau, 8, 8)) return false;
         Carta c = celdaLibres[fromFreeCell].verCarta(0);
@@ -60,6 +75,9 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve carta del tableau a fundación
+     */
     public boolean moverTableauAFoundation(int fromTableau) {
         Carta c = tablero[fromTableau].peek();
         if (c == null) return false;
@@ -73,6 +91,9 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve carta de celda libre a fundación
+     */
     public boolean moverFreeCellAFoundation(int fromFreeCell) {
         Carta c = celdaLibres[fromFreeCell].verCarta(0);
         if (c == null) return false;
@@ -86,6 +107,9 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve carta de fundación al tableau
+     */
     public boolean moverFoundationATableau(int fromFoundation, int toTableau) {
         if (!validarIndices(fromFoundation, toTableau, 4, 8)) return false;
         Carta c = foundations[fromFoundation].verUltimaCarta();
@@ -99,6 +123,9 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve carta de fundación a celda libre
+     */
     public boolean moverFoundationAFreeCell(int fromFoundation, int toFreeCell) {
         if (!validarIndices(fromFoundation, toFreeCell, 4, 8)) return false;
         Carta c = foundations[fromFoundation].verUltimaCarta();
@@ -111,9 +138,28 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Mueve cartas entre columnas del tableau
+     */
     public boolean moverCartaTableauATableau(int from, int to) {
         if (from == to) return false;
         if (!validarIndices(from, to, tablero.length, tablero.length)) return false;
+        if (tablero[from].estaVacia()) return false;
+
+        int size = tablero[from].size();
+
+        for (int i = 0; i < size; i++) {
+            if (!tablero[from].esEscaleraValidaDesde(i)) continue;
+
+            Carta primera = tablero[from].getCarta(i);
+            if (tablero[to].puedoColocarCarta(primera)) {
+                int cantidad = size - i;
+                ListaSimple<Carta> pack = tablero[from].popN(cantidad);
+                tablero[to].pushEscalera(pack);
+                undo.insertarFin(EstadoJuego.tt(from, to, primera, cantidad));
+                return true;
+            }
+        }
 
         Carta carta = tablero[from].peek();
         if (carta == null) return false;
@@ -127,21 +173,35 @@ public class EightOff {
         return false;
     }
 
+    /**
+     * Valida que los índices estén dentro de los límites
+     */
     private boolean validarIndices(int a, int b, int maxA, int maxB) {
         return a >= 0 && a < maxA && b >= 0 && b < maxB;
     }
 
+    /**
+     * Encuentra la fundación correspondiente al palo de la carta
+     */
     private int getIdxFoundation(String figuraPalo) {
         for (int i = 0; i < foundations.length; i++)
             if (foundations[i].getPalo().getFigura().equals(figuraPalo)) return i;
         return -1;
     }
 
+    /**
+     * Verifica si todas las fundaciones están completas
+     */
     public boolean evaluarVictoria() {
-        for (Foundation f : foundations) if (f.getSize() != 13) return false;
+        for (Foundation f : foundations) {
+            if (!f.estaCompleta()) return false;
+        }
         return true;
     }
 
+    /**
+     * Deshace el último movimiento realizado
+     */
     public boolean undo() {
         EstadoJuego ultimoMov = undo.eliminarFin();
         if (ultimoMov == null) return false;
@@ -180,61 +240,68 @@ public class EightOff {
         return true;
     }
 
+    /**
+     * Busca y devuelve un movimiento sugerido
+     */
     public EstadoJuego obtenerPista() {
-
         for (int fc = 0; fc < celdaLibres.length; fc++) {
             Carta c = celdaLibres[fc].peek();
             if (c == null) continue;
 
-            int f = getIdxFoundation(c.getFigura());
-            if (f != -1 && foundations[f].puedeAgregar(c))
-                return EstadoJuego.cf(fc, f, c);
+            int idxF = getIdxFoundation(c.getFigura());
+            if (idxF != -1 && foundations[idxF].puedeAgregar(c)) {
+                return EstadoJuego.cf(fc, idxF, c);
+            }
         }
 
         for (int t = 0; t < tablero.length; t++) {
             Carta c = tablero[t].peek();
             if (c == null) continue;
 
-            int f = getIdxFoundation(c.getFigura());
-            if (f != -1 && foundations[f].puedeAgregar(c))
-                return EstadoJuego.tf(t, f, c);
+            int idxF = getIdxFoundation(c.getFigura());
+            if (idxF != -1 && foundations[idxF].puedeAgregar(c)) {
+                return EstadoJuego.tf(t, idxF, c);
+            }
         }
+        for (int from = 0; from < tablero.length; from++) {
+            Tableau origen = tablero[from];
+            if (origen.estaVacia()) continue;
 
+            int size = origen.size();
+            for (int i = 0; i < size; i++) {
+                if (!origen.esEscaleraValidaDesde(i)) continue;
+
+                ListaSimple<Carta> run = origen.obtenerEscaleraDesde(i);
+                Carta cartaSuperior = run.getPosicion(0);
+
+                for (int to = 0; to < tablero.length; to++) {
+                    if (from == to) continue;
+                    Tableau destino = tablero[to];
+                    if (destino.estaVacia() || destino.puedoColocarEscalera(run)) {
+                        return EstadoJuego.tt(from, to, cartaSuperior, run.getSize());
+                    }
+                }
+            }
+        }
         for (int fc = 0; fc < celdaLibres.length; fc++) {
             Carta c = celdaLibres[fc].peek();
             if (c == null) continue;
 
             for (int t = 0; t < tablero.length; t++) {
-                if (tablero[t].puedoColocarCarta(c))
+                Tableau destino = tablero[t];
+                if (destino.estaVacia() || destino.puedoColocarCarta(c)) {
                     return EstadoJuego.ct(fc, t, c);
-            }
-        }
-
-        int celdasLibres = getFreeCellsDisponibles();
-        if (celdasLibres > 0) {
-            for (int t = 0; t < tablero.length; t++) {
-                Carta c = tablero[t].peek();
-                if (c == null) continue;
-
-                for (int fc = 0; fc < celdaLibres.length; fc++) {
-                    if (celdaLibres[fc].estaVacia())
-                        return EstadoJuego.tc(t, fc, c);
                 }
             }
         }
 
-        for (int t1 = 0; t1 < tablero.length; t1++) {
-            if (tablero[t1].estaVacia()) continue;
+        for (int t = 0; t < tablero.length; t++) {
+            Carta c = tablero[t].peek();
+            if (c == null) continue;
 
-            int size = tablero[t1].size();
-            for (int i = 0; i < size; i++) {
-                Carta c = tablero[t1].getCarta(i);
-                if (!tablero[t1].esEscaleraValidaDesde(i)) continue;
-
-                for (int t2 = 0; t2 < tablero.length; t2++) {
-                    if (t1 == t2) continue;
-                    if (tablero[t2].puedoColocarCarta(c))
-                        return EstadoJuego.tt(t1, t2, c, size - i);
+            for (int fc = 0; fc < celdaLibres.length; fc++) {
+                if (celdaLibres[fc].estaVacia()) {
+                    return EstadoJuego.tc(t, fc, c);
                 }
             }
         }
@@ -244,19 +311,9 @@ public class EightOff {
             if (c == null) continue;
 
             for (int t = 0; t < tablero.length; t++) {
-                if (tablero[t].puedoColocarCarta(c))
+                Tableau destino = tablero[t];
+                if (destino.estaVacia() || destino.puedoColocarCarta(c)) {
                     return EstadoJuego.ft(f, t, c);
-            }
-        }
-
-        if (celdasLibres > 0) {
-            for (int f = 0; f < foundations.length; f++) {
-                Carta c = foundations[f].verUltimaCarta();
-                if (c == null) continue;
-
-                for (int fc = 0; fc < celdaLibres.length; fc++) {
-                    if (celdaLibres[fc].estaVacia())
-                        return EstadoJuego.fc(f, fc, c);
                 }
             }
         }
@@ -264,46 +321,37 @@ public class EightOff {
         return null;
     }
 
+    /**
+     * Verifica si hay movimientos disponibles
+     */
     public boolean hayMovimientosDisponibles() {
-
         return obtenerPista() != null;
     }
 
-    public Carta getTopTableau(int col) {
-        return tablero[col].peek();
-    }
-
+    /**
+     * Obtiene la carta superior de una celda libre
+     */
     public Carta getTopFreeCell(int i) {
         return celdaLibres[i].verCarta(0);
     }
 
+    /**
+     * Obtiene la carta superior de una fundación
+     */
     public Carta getTopFoundation(int i) {
         return foundations[i].verUltimaCarta();
     }
 
-    public ListaSimple<Carta> getTableau(int idx) {
-        return tablero[idx].getCartas();
-    }
-
+    /**
+     * Obtiene un objeto tableau por índice
+     */
     public Tableau getTableauObject(int idx) {
         return tablero[idx];
     }
 
-    public CeldaLibre getFreeCell(int idx) {
-        return celdaLibres[idx];
-    }
-
-    public Foundation getFoundation(int idx) {
-        return foundations[idx];
-    }
-
-    public int getFreeCellsDisponibles() {
-        int count = 0;
-        for (CeldaLibre fc : celdaLibres)
-            if (fc.estaVacia()) count++;
-        return count;
-    }
-
+    /**
+     * Reparte las cartas iniciales del juego
+     */
     public void repartirCartasIniciales() {
         limpiarComponentes();
         for (int fila = 0; fila < 6; fila++) {
@@ -320,25 +368,5 @@ public class EightOff {
                 celdaLibres[i].agregarCarta(carta);
             }
         }
-    }
-
-    private boolean escaleraValida(ListaSimple<Carta> run) {
-        if (run == null || run.getSize() == 0) return false;
-
-        if (run.getSize() == 1) return true;
-
-        for (int i = 0; i < run.getSize() - 1; i++) {
-            Carta cartaActual = run.getPosicion(i);
-            Carta cartaSiguiente = run.getPosicion(i + 1);
-
-            if (!cartaActual.getFigura().equals(cartaSiguiente.getFigura())) {
-                return false;
-            }
-
-            if (cartaActual.getValor() != cartaSiguiente.getValor() + 1) {
-                return false;
-            }
-        }
-        return true;
     }
 }
