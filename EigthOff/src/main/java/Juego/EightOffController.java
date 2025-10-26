@@ -107,7 +107,7 @@ public class EightOffController {
     private void manejarUndo() {
         if (juegoEightOff.undo()) {
             actualizarInterfaz();
-            lblEstado.setText("Movimiento deshecho");
+            lblEstado.setText("               Movimiento deshecho");
             lblEstado.setStyle("-fx-text-fill: #87CEEB; -fx-font-weight: bold;");
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,107 +8,94 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="rootPane" style="-fx-background-color: #7d1414;"
-            prefHeight="768.0" prefWidth="1366.0"
-            xmlns="http://javafx.com/javafx/24.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="Juego.EightOffController">
+<AnchorPane fx:id="rootPane" prefHeight="1000.0" prefWidth="1791.0" style="-fx-background-color: #7d1414;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Juego.EightOffController">
 
     <!-- Celdas libres -->
-    <HBox fx:id="freeCellsHBox" spacing="15.0" layoutX="485.0" layoutY="40.0" alignment="CENTER">
+    <HBox fx:id="freeCellsHBox" alignment="CENTER" layoutX="485.0" layoutY="40.0" spacing="15.0">
         <children>
-            <StackPane fx:id="freeCell1" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell2" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell3" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell4" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell5" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell6" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell7" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
-            <StackPane fx:id="freeCell8" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot"/>
+            <StackPane fx:id="freeCell1" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell2" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell3" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell4" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell5" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell6" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell7" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="freeCell8" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
         </children>
     </HBox>
 
     <!-- Fundaciones -->
-    <VBox fx:id="foundationsVBox" spacing="20.0" layoutX="100.0" layoutY="300.0">
+    <VBox fx:id="foundationsVBox" layoutX="100.0" layoutY="300.0" spacing="20.0">
         <children>
-            <StackPane fx:id="fundacionPicas" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot">
-                <children>
-                    <Label text="♠" style="-fx-font-size: 36px; -fx-text-fill: black;"/>
-                </children>
-            </StackPane>
-            <StackPane fx:id="fundacionCorazones" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot">
-                <children>
-                    <Label text="♥" style="-fx-font-size: 36px; -fx-text-fill: #ff0000;"/>
-                </children>
-            </StackPane>
-            <StackPane fx:id="fundacionTreboles" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot">
-                <children>
-                    <Label text="♣" style="-fx-font-size: 36px; -fx-text-fill: black;"/>
-                </children>
-            </StackPane>
-            <StackPane fx:id="fundacionDiamantes" prefWidth="120" prefHeight="160"
-                       style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot">
-                <children>
-                    <Label text="♦" style="-fx-font-size: 36px; -fx-text-fill: #ff0000;"/>
-                </children>
-            </StackPane>
+            <StackPane fx:id="fundacionPicas" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="fundacionCorazones" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="fundacionTreboles" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
+            <StackPane fx:id="fundacionDiamantes" prefHeight="160" prefWidth="120" style="-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);" styleClass="slot" />
         </children>
     </VBox>
 
     <!-- Tableaus -->
-    <HBox fx:id="tableausHBox" spacing="25.0" layoutX="450.0" layoutY="300.0" alignment="TOP_CENTER">
+    <HBox fx:id="tableausHBox" alignment="TOP_CENTER" layoutX="450.0" layoutY="300.0" spacing="25.0">
         <children>
-            <VBox fx:id="columna1" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna2" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna3" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna4" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna5" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna6" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna7" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
-            <VBox fx:id="columna8" prefWidth="120" prefHeight="600" spacing="-100.0"
-                  style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;"/>
+            <VBox fx:id="columna1" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna2" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna3" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna4" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna5" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna6" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna7" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
+            <VBox fx:id="columna8" prefHeight="600" prefWidth="120" spacing="-100.0" style="-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;" />
         </children>
     </HBox>
-
-    <!-- Botones -->
-    <VBox spacing="15.0" layoutX="750.0" layoutY="950.0" alignment="CENTER">
-        <children>
-            <Label fx:id="lblEstado" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FFD700; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);"/>
-
-            <HBox spacing="30.0" alignment="CENTER">
-                <children>
-                    <Button fx:id="btnPista" text="💡 Pista" prefWidth="120" prefHeight="45"
-                            style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;
-                                   -fx-background-color: linear-gradient(#0f3d2e, #0b2a20); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #2a5948;
-                                   -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;"/>
-                    <Button fx:id="btnUndo" text="↩ Undo" prefWidth="120" prefHeight="45"
-                            style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;
-                                   -fx-background-color: linear-gradient(#0f3d2e, #0b2a20); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #2a5948;
-                                   -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;"/>
-                    <Button fx:id="btnSalir" text="Salir" prefWidth="120" prefHeight="45"
-                            style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;
-                                   -fx-background-color: linear-gradient(#8B0000, #660000); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #A52A2A;
-                                   -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;"/>
-                </children>
-            </HBox>
-        </children>
-    </VBox>
+   <VBox layoutX="110.0" layoutY="53.0" prefHeight="160.0" prefWidth="100.0">
+      <children>
+         <HBox prefHeight="100.0" prefWidth="200.0">
+            <children>
+                <Button fx:id="btnPista" prefHeight="45" prefWidth="120" style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;                                    -fx-background-color: linear-gradient(#0f3d2e, #0b2a20); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #2a5948;                                    -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;" text="💡 Pista" />
+            </children>
+         </HBox>
+          <Button fx:id="btnUndo" prefHeight="45.0" prefWidth="120.0" style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;                                    -fx-background-color: linear-gradient(#0f3d2e, #0b2a20); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #2a5948;                                    -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;" text="↩ Undo" />
+      </children>
+   </VBox>
+   <HBox layoutX="501.0" layoutY="264.0" prefHeight="25.0" prefWidth="514.0" spacing="140.0">
+      <children>
+          <Label fx:id="lblEstado1" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="1" textFill="WHITE" />
+          <Label fx:id="lblEstado11" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="2" textFill="WHITE" />
+          <Label fx:id="lblEstado12" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="3" textFill="WHITE" translateX="-8.0" />
+          <Label fx:id="lblEstado13" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="4" textFill="WHITE" translateX="-10.0" />
+          <Label fx:id="lblEstado14" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="5" textFill="WHITE" translateX="-15.0" />
+          <Label fx:id="lblEstado141" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="6" textFill="WHITE" translateX="-20.0" />
+          <Label fx:id="lblEstado142" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="7" textFill="WHITE" translateX="-25.0" />
+          <Label fx:id="lblEstado143" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="8" textFill="WHITE" translateX="-30.0" />
+      </children>
+      <opaqueInsets>
+         <Insets />
+      </opaqueInsets>
+   </HBox>
+   <HBox layoutX="536.0" layoutY="14.0" prefHeight="25.0" prefWidth="514.0" spacing="130.0">
+      <children>
+         <Label fx:id="lblEstado11" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="1" textFill="WHITE" />
+         <Label fx:id="lblEstado112" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="2" textFill="WHITE" />
+         <Label fx:id="lblEstado122" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="3" textFill="WHITE" translateX="-8.0" />
+         <Label fx:id="lblEstado132" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="4" textFill="WHITE" translateX="-10.0" />
+         <Label fx:id="lblEstado141" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="5" textFill="WHITE" translateX="-15.0" />
+         <Label fx:id="lblEstado1412" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="6" textFill="WHITE" translateX="-20.0" />
+         <Label fx:id="lblEstado1422" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="7" textFill="WHITE" translateX="-25.0" />
+         <Label fx:id="lblEstado1432" prefHeight="25.0" prefWidth="15.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" text="8" textFill="WHITE" translateX="-30.0" />
+      </children>
+      <opaqueInsets>
+         <Insets />
+      </opaqueInsets>
+   </HBox>
+   <VBox layoutX="250.0" layoutY="353.0" prefHeight="602.0" prefWidth="34.0" spacing="130.0">
+      <children>
+          <Label opacity="0.25" style="-fx-font-size: 36px; -fx-text-fill: black;" text="♠" />
+          <Label opacity="0.25" style="-fx-font-size: 36px; -fx-text-fill: #ff0000;" text="♥" />
+          <Label opacity="0.25" style="-fx-font-size: 36px; -fx-text-fill: black;" text="♣" />
+          <Label opacity="0.25" prefHeight="53.0" prefWidth="29.0" style="-fx-font-size: 36px; -fx-text-fill: #ff0000;" text="♦" />
+      </children>
+   </VBox>
+    <Button fx:id="btnSalir" layoutX="958.0" layoutY="955.0" prefHeight="45.0" prefWidth="120" style="-fx-font-family: 'Montserrat SemiBold'; -fx-font-size: 14px; -fx-text-fill: white;                                    -fx-background-color: linear-gradient(#8B0000, #660000); -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #A52A2A;                                    -fx-border-width: 2; -fx-padding: 8 20 8 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.25, 0, 3); -fx-cursor: hand; -fx-font-weight: bold;" text="Salir" />
+    <Label fx:id="lblEstado" layoutX="906.0" layoutY="239.0" prefHeight="25.0" prefWidth="237.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FFD700; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0.5, 1, 1);" textAlignment="CENTER" />
 
 </AnchorPane>
