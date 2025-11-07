@@ -10,7 +10,7 @@ public class EightOff {
     private final Tableau[] tablero;
     private final CeldaLibre[] celdaLibres;
     public final Foundation[] foundations;
-    private final ListaSimple<EstadoJuego> undo;
+    private final HistorialJuego historial;
 
     /**
      * Crea el juego Eight Off con mazo, tablero, celdas libres y fundaciones
@@ -20,7 +20,7 @@ public class EightOff {
         tablero = new Tableau[8];
         celdaLibres = new CeldaLibre[8];
         foundations = new Foundation[4];
-        undo = new ListaSimple<>();
+        historial = new HistorialJuego();
         iniciarComponentes();
     }
 
@@ -41,7 +41,7 @@ public class EightOff {
         for (Tableau t : tablero) t.clear();
         for (CeldaLibre fc : celdaLibres) while (fc.sacarCarta(0) != null) {}
         for (Foundation f : foundations) f.clear();
-        while (undo.eliminarFin() != null) {}
+        historial.limpiar();
     }
 
     /**
@@ -53,7 +53,9 @@ public class EightOff {
         if (c == null) return false;
         if (celdaLibres[toFreeCell].agregarCarta(c)) {
             tablero[fromTableau].pop();
-            undo.insertarFin(EstadoJuego.tc(fromTableau, toFreeCell, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.tc(fromTableau, toFreeCell, c));
+            }
             return true;
         }
         return false;
@@ -69,7 +71,9 @@ public class EightOff {
         if (tablero[toTableau].puedoColocarCarta(c)) {
             celdaLibres[fromFreeCell].sacarCarta(0);
             tablero[toTableau].push(c);
-            undo.insertarFin(EstadoJuego.ct(fromFreeCell, toTableau, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.ct(fromFreeCell, toTableau, c));
+            }
             return true;
         }
         return false;
@@ -85,7 +89,9 @@ public class EightOff {
         if (foundations[idx].puedeAgregar(c)) {
             tablero[fromTableau].pop();
             foundations[idx].agregarCarta(c);
-            undo.insertarFin(EstadoJuego.tf(fromTableau, idx, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.tf(fromTableau, idx, c));
+            }
             return true;
         }
         return false;
@@ -101,7 +107,9 @@ public class EightOff {
         if (foundations[idx].puedeAgregar(c)) {
             celdaLibres[fromFreeCell].sacarCarta(0);
             foundations[idx].agregarCarta(c);
-            undo.insertarFin(EstadoJuego.cf(fromFreeCell, idx, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.cf(fromFreeCell, idx, c));
+            }
             return true;
         }
         return false;
@@ -117,7 +125,9 @@ public class EightOff {
         if (tablero[toTableau].puedoColocarCarta(c)) {
             foundations[fromFoundation].sacarCarta();
             tablero[toTableau].push(c);
-            undo.insertarFin(EstadoJuego.ft(fromFoundation, toTableau, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.ft(fromFoundation, toTableau, c));
+            }
             return true;
         }
         return false;
@@ -132,7 +142,9 @@ public class EightOff {
         if (c == null) return false;
         if (celdaLibres[toFreeCell].agregarCarta(c)) {
             foundations[fromFoundation].sacarCarta();
-            undo.insertarFin(EstadoJuego.fc(fromFoundation, toFreeCell, c));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.fc(fromFoundation, toFreeCell, c));
+            }
             return true;
         }
         return false;
@@ -156,7 +168,9 @@ public class EightOff {
                 int cantidad = size - i;
                 ListaSimple<Carta> pack = tablero[from].popN(cantidad);
                 tablero[to].pushEscalera(pack);
-                undo.insertarFin(EstadoJuego.tt(from, to, primera, cantidad));
+                if (!historial.isModoHistorial()) {
+                    historial.agregarMovimiento(EstadoJuego.tt(from, to, primera, cantidad));
+                }
                 return true;
             }
         }
@@ -167,7 +181,9 @@ public class EightOff {
         if (tablero[to].puedoColocarCarta(carta)) {
             Carta cartaMovida = tablero[from].pop();
             tablero[to].push(cartaMovida);
-            undo.insertarFin(EstadoJuego.tt(from, to, cartaMovida, 1));
+            if (!historial.isModoHistorial()) {
+                historial.agregarMovimiento(EstadoJuego.tt(from, to, cartaMovida, 1));
+            }
             return true;
         }
         return false;
@@ -203,41 +219,62 @@ public class EightOff {
      * Deshace el último movimiento realizado
      */
     public boolean undo() {
-        EstadoJuego ultimoMov = undo.eliminarFin();
-        if (ultimoMov == null) return false;
-
-        switch (ultimoMov.getTipo()) {
-            case TT -> {
-                int cantidad = Math.max(1, ultimoMov.getCantidad());
-                ListaSimple<Carta> pack = tablero[ultimoMov.getToIdx()].popN(cantidad);
-                tablero[ultimoMov.getFromIdx()].pushAllInicial(pack);
+        if (historial.isModoHistorial()) {
+            return undoDesdeHistorial();
+        } else {
+            EstadoJuego ultimoMov = historial.undo();
+            if (ultimoMov != null) {
+                ultimoMov.revertir(this);
+                return true;
             }
-            case TC -> {
-                Carta c = celdaLibres[ultimoMov.getToIdx()].sacarCarta(0);
-                tablero[ultimoMov.getFromIdx()].pushInicial(c);
-            }
-            case CT -> {
-                Carta c = tablero[ultimoMov.getToIdx()].pop();
-                celdaLibres[ultimoMov.getFromIdx()].agregarCarta(c);
-            }
-            case TF -> {
-                Carta c = foundations[ultimoMov.getToIdx()].sacarCarta();
-                tablero[ultimoMov.getFromIdx()].pushInicial(c);
-            }
-            case CF -> {
-                Carta c = foundations[ultimoMov.getToIdx()].sacarCarta();
-                celdaLibres[ultimoMov.getFromIdx()].agregarCarta(c);
-            }
-            case FT -> {
-                Carta c = tablero[ultimoMov.getToIdx()].pop();
-                foundations[ultimoMov.getFromIdx()].agregarCarta(c);
-            }
-            case FC -> {
-                Carta c = celdaLibres[ultimoMov.getToIdx()].sacarCarta(0);
-                foundations[ultimoMov.getFromIdx()].agregarCarta(c);
-            }
+            return false;
         }
-        return true;
+    }
+
+    /**
+     * Deshace movimiento desde el historial
+     */
+    boolean undoDesdeHistorial() {
+        EstadoJuego movimiento = historial.undo();
+        if (movimiento != null) {
+            movimiento.revertir(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verifica si se puede activar el modo historial
+     * @return true si hay movimientos en el historial, false en caso contrario
+     */
+    public boolean sePuedeActivarHistorial() {
+        return historial.sePuedeActivarHistorial();
+    }
+
+    /**
+     * Rehace movimiento desde el historial
+     */
+    public boolean redoDesdeHistorial() {
+        EstadoJuego movimiento = historial.redo();
+        if (movimiento != null) {
+            movimiento.ejecutar(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Aplica el estado actual del historial al juego
+     */
+    public void aplicarHistorial() {
+        historial.setModoHistorial(false);
+    }
+
+    /**
+     * Activa el modo historial
+     */
+    public void activarModoHistorial() {
+        historial.setModoHistorial(true);
     }
 
     /**
@@ -350,6 +387,13 @@ public class EightOff {
     }
 
     /**
+     * Obtiene un objeto celda libre por índice
+     */
+    public CeldaLibre getFreeCellObject(int idx) {
+        return celdaLibres[idx];
+    }
+
+    /**
      * Reparte las cartas iniciales del juego
      */
     public void repartirCartasIniciales() {
@@ -368,5 +412,12 @@ public class EightOff {
                 celdaLibres[i].agregarCarta(carta);
             }
         }
+    }
+
+    /**
+     * Obtiene el historial del juego
+     */
+    public HistorialJuego getHistorial() {
+        return historial;
     }
 }

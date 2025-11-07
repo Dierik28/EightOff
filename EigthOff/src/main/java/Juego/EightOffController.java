@@ -5,6 +5,8 @@ import Listas.ListaSimple;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -20,6 +22,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -29,6 +32,10 @@ public class EightOffController {
     @FXML private Button btnPista;
     @FXML private Button btnUndo;
     @FXML private Button btnSalir;
+    @FXML private Button btnHistorial;
+    @FXML private Button btnAplicarHistorial;
+    @FXML private Button btnUndoHistorial;
+    @FXML private Button btnRedoHistorial;
 
     // Elementos de la interfaz gráfica
     @FXML private StackPane freeCell1, freeCell2, freeCell3, freeCell4;
@@ -39,6 +46,8 @@ public class EightOffController {
     @FXML private HBox freeCellsHBox, tableausHBox;
     @FXML private VBox foundationsVBox;
     @FXML private Label lblEstado;
+    @FXML private Label lblPosicionHistorial;
+    @FXML private VBox panelHistorial;
 
     private EightOff juegoEightOff;
     private ArrayList<VBox> panelesColumnas;
@@ -47,6 +56,7 @@ public class EightOffController {
     private Timeline hintTimeline;
     private StackPane panelPistaActual;
     private EstadoJuego pistaActual;
+    private boolean juegoTerminado = false;
 
     /**
      * Inicializa el controlador: crea el juego, configura listas y eventos
@@ -71,32 +81,281 @@ public class EightOffController {
         panelesFreeCells.add(freeCell5); panelesFreeCells.add(freeCell6);
         panelesFreeCells.add(freeCell7); panelesFreeCells.add(freeCell8);
 
-        // Configurar botones
         btnUndo.setOnAction(e -> manejarUndo());
         btnPista.setOnAction(e -> manejarPista());
         btnSalir.setOnAction(e -> System.exit(0));
+        btnHistorial.setOnAction(e -> activarModoHistorial());
+        btnAplicarHistorial.setOnAction(e -> aplicarHistorial());
+        btnUndoHistorial.setOnAction(e -> undoHistorial());
+        btnRedoHistorial.setOnAction(e -> redoHistorial());
 
         configurarEventos();
         juegoEightOff.repartirCartasIniciales();
         actualizarInterfaz();
+        panelHistorial.setVisible(false);
     }
+
+    /**
+     * Activa el modo historial
+     */
+    private void activarModoHistorial() {
+        if (juegoTerminado) return;
+
+        if (!juegoEightOff.sePuedeActivarHistorial()) {
+            System.out.println("Historial Vacío");
+            return;
+        }
+
+        try {
+            juegoEightOff.activarModoHistorial();
+            panelHistorial.setVisible(true);
+            actualizarControlesHistorial();
+            actualizarEstadoControles();
+            resaltarMovimientoActual();
+            lblEstado.setText("Modo historial");
+            lblEstado.setStyle("-fx-text-fill: #FFA500; -fx-font-weight: bold;");
+
+            System.out.println("Historial activado. Total movimientos: " +
+                    juegoEightOff.getHistorial().getTotalMovimientos());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error, No se pudo activar el modo historial: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Aplica el estado del historial al juego
+     */
+    private void aplicarHistorial() {
+        try {
+            juegoEightOff.aplicarHistorial();
+            panelHistorial.setVisible(false);
+            actualizarInterfaz();
+            actualizarEstadoControles();
+            lblEstado.setText("Historial aplicado");
+            lblEstado.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error, No se pudo aplicar el historial: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Retrocede en el historial
+     */
+    private void undoHistorial() {
+        if (juegoEightOff.undoDesdeHistorial()) {
+            actualizarInterfaz();
+            actualizarControlesHistorial();
+            resaltarMovimientoActual();
+        }
+    }
+
+    /**
+     * Avanza en el historial
+     */
+    private void redoHistorial() {
+        if (juegoEightOff.redoDesdeHistorial()) {
+            actualizarInterfaz();
+            actualizarControlesHistorial();
+            resaltarMovimientoActual();
+        }
+    }
+
+    /**
+     * Actualiza los controles del historial
+     */
+    private void actualizarControlesHistorial() {
+        HistorialJuego historial = juegoEightOff.getHistorial();
+        int posActual = historial.getPosicionActual() + 1;
+        int total = historial.getTotalMovimientos();
+
+        lblPosicionHistorial.setText(posActual + " / " + total);
+
+        btnUndoHistorial.setDisable(historial.getPosicionActual() < 0);
+        btnRedoHistorial.setDisable(historial.getPosicionActual() >= total - 1);
+    }
+
+    /**
+     * Resalta las cartas involucradas en el movimiento actual del historial
+     */
+    private void resaltarMovimientoActual() {
+        if (!juegoEightOff.getHistorial().isModoHistorial()) return;
+
+        EstadoJuego movimiento = juegoEightOff.getHistorial().getMovimientoActual();
+        if (movimiento == null) return;
+
+        limpiarResaltados();
+
+        switch (movimiento.getTipo()) {
+            case TT -> {
+
+                resaltarCartaMovidaTableau(movimiento.getFromIdx(), movimiento.getCarta());
+                resaltarColumnaTableau(movimiento.getToIdx());
+            }
+            case TC -> {
+
+                resaltarCartaMovidaTableau(movimiento.getFromIdx(), movimiento.getCarta());
+                resaltarFreeCell(movimiento.getToIdx());
+            }
+            case TF -> {
+
+                resaltarCartaMovidaTableau(movimiento.getFromIdx(), movimiento.getCarta());
+                resaltarFundacion(movimiento.getToIdx());
+            }
+            case CT -> {
+
+                resaltarFreeCell(movimiento.getFromIdx());
+                resaltarColumnaTableau(movimiento.getToIdx());
+            }
+            case CF -> {
+                resaltarFreeCell(movimiento.getFromIdx());
+                resaltarFundacion(movimiento.getToIdx());
+            }
+            case FT -> {
+                resaltarFundacion(movimiento.getFromIdx());
+                resaltarColumnaTableau(movimiento.getToIdx());
+            }
+            case FC -> {
+                resaltarFundacion(movimiento.getFromIdx());
+                resaltarFreeCell(movimiento.getToIdx());
+            }
+        }
+    }
+
+    /**
+     * Resalta la carta específica que se movió en una columna del tableau
+     */
+    private void resaltarCartaMovidaTableau(int indiceTableau, Carta cartaMovida) {
+        if (indiceTableau >= 0 && indiceTableau < panelesColumnas.size()) {
+            VBox columna = panelesColumnas.get(indiceTableau);
+
+            for (javafx.scene.Node node : columna.getChildren()) {
+                if (node instanceof Label) {
+                    Label cartaLabel = (Label) node;
+                    String textoCarta = cartaLabel.getText();
+                    if (representaCarta(textoCarta, cartaMovida)) {
+                        cartaLabel.setStyle(cartaLabel.getStyle() + " -fx-effect: dropshadow(gaussian, #FFD700, 20, 0.5, 0, 0); -fx-border-color: #FFD700; -fx-border-width: 2;");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Resalta una columna del tableau completa
+     */
+    private void resaltarColumnaTableau(int indiceTableau) {
+        if (indiceTableau >= 0 && indiceTableau < panelesColumnas.size()) {
+            VBox columna = panelesColumnas.get(indiceTableau);
+            columna.setStyle("-fx-background-color: rgba(255, 215, 0, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #FFD700; -fx-border-width: 2;");
+        }
+    }
+
+    /**
+     * Resalta una celda libre
+     */
+    private void resaltarFreeCell(int indiceFreeCell) {
+        if (indiceFreeCell >= 0 && indiceFreeCell < panelesFreeCells.size()) {
+            StackPane freeCell = panelesFreeCells.get(indiceFreeCell);
+            freeCell.setStyle("-fx-border-color: #FFD700; -fx-border-width: 3; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(255, 215, 0, 0.3);");
+        }
+    }
+
+    /**
+     * Resalta una fundación
+     */
+    private void resaltarFundacion(int indiceFundacion) {
+        if (indiceFundacion >= 0 && indiceFundacion < panelesFundaciones.size()) {
+            StackPane fundacion = panelesFundaciones.get(indiceFundacion);
+            fundacion.setStyle("-fx-border-color: #FFD700; -fx-border-width: 3; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(255, 215, 0, 0.3);");
+        }
+    }
+
+    /**
+     * Verifica si el texto de una etiqueta representa la carta especificada
+     */
+    private boolean representaCarta(String textoEtiqueta, Carta carta) {
+        if (textoEtiqueta == null || carta == null) return false;
+
+        String valor;
+        switch (carta.getValor()) {
+            case 1: valor = "A"; break;
+            case 11: valor = "J"; break;
+            case 12: valor = "Q"; break;
+            case 13: valor = "K"; break;
+            default: valor = String.valueOf(carta.getValor());
+        }
+
+        String textoEsperado = valor + carta.getFigura();
+        return textoEtiqueta.equals(textoEsperado);
+    }
+
+    /**
+     * Resalta una carta en el tableau
+     */
+    private void resaltarCartaTableau(int indiceTableau) {
+        if (indiceTableau >= 0 && indiceTableau < panelesColumnas.size()) {
+            VBox columna = panelesColumnas.get(indiceTableau);
+            if (!columna.getChildren().isEmpty()) {
+                Label ultimaCarta = (Label) columna.getChildren().get(columna.getChildren().size() - 1);
+                ultimaCarta.setStyle(ultimaCarta.getStyle() + " -fx-effect: dropshadow(gaussian, #FFD700, 20, 0.5, 0, 0);");
+            }
+        }
+    }
+
+    /**
+     * Limpia todos los resaltados
+     */
+    private void limpiarResaltados() {
+        for (StackPane freeCell : panelesFreeCells) {
+            freeCell.setStyle("-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);");
+        }
+        for (StackPane fundacion : panelesFundaciones) {
+            fundacion.setStyle("-fx-border-color: rgba(255,255,255,0.8); -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-background-color: rgba(144, 238, 144, 0.3);");
+        }
+
+        for (VBox columna : panelesColumnas) {
+            columna.setStyle("-fx-background-color: rgba(144, 238, 144, 0.2); -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1;");
+
+            for (javafx.scene.Node node : columna.getChildren()) {
+                if (node instanceof Label) {
+                    Label cartaLabel = (Label) node;
+                    String estiloOriginal = cartaLabel.getStyle();
+                    estiloOriginal = estiloOriginal.replaceAll("-fx-effect:[^;]*;", "");
+                    estiloOriginal = estiloOriginal.replaceAll("-fx-border-color:[^;]*;", "-fx-border-color: black;");
+                    estiloOriginal = estiloOriginal.replaceAll("-fx-border-width:[^;]*;", "-fx-border-width: 1;");
+                    cartaLabel.setStyle(estiloOriginal);
+                }
+            }
+        }
+    }
+
 
     /**
      * Muestra una pista al usuario resaltando un movimiento posible
      */
     @FXML
     private void manejarPista() {
-        limpiarPista();
-        EstadoJuego nuevaPista = juegoEightOff.obtenerPista();
+        if (juegoEightOff.getHistorial().isModoHistorial()) {
+            System.out.println("La función de pista no está disponible en modo historial.");
+            return;
+        }
 
+        limpiarPista();
+        if (juegoTerminado) return;
+
+        EstadoJuego nuevaPista = juegoEightOff.obtenerPista();
         if (nuevaPista != null) {
             pistaActual = nuevaPista;
             mostrarPista(pistaActual);
-
             hintTimeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> limpiarPista()));
             hintTimeline.play();
         } else {
-            mostrarSinMovimientos();
+            mostrarVentanaSinMovimientos();
         }
     }
 
@@ -105,12 +364,19 @@ public class EightOffController {
      */
     @FXML
     private void manejarUndo() {
-        if (juegoEightOff.undo()) {
-            actualizarInterfaz();
-            lblEstado.setText("               Movimiento deshecho");
-            lblEstado.setStyle("-fx-text-fill: #87CEEB; -fx-font-weight: bold;");
+        if (juegoTerminado) return;
+
+        if (juegoEightOff.getHistorial().isModoHistorial()) {
+            undoHistorial();
+        } else {
+            if (juegoEightOff.undo()) {
+                actualizarInterfaz();
+                lblEstado.setText("Movimiento deshecho");
+                lblEstado.setStyle("-fx-text-fill: #87CEEB; -fx-font-weight: bold;");
+            }
         }
     }
+
 
     /**
      * Muestra un mensaje descriptivo de la pista encontrada
@@ -150,20 +416,6 @@ public class EightOffController {
         if (hintTimeline != null) {
             hintTimeline.stop();
         }
-        if (lblEstado.getText().startsWith("Pista:")) {
-            lblEstado.setStyle("-fx-text-fill: #90EE90; -fx-font-weight: normal;");
-        }
-    }
-
-    /**
-     * Muestra alerta cuando no hay movimientos disponibles
-     */
-    private void mostrarSinMovimientos() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Sin movimientos");
-        alert.setHeaderText("No hay movimientos disponibles");
-        alert.setContentText("No hay más movimientos posibles en el juego actual.");
-        alert.showAndWait();
     }
 
     /**
@@ -185,8 +437,12 @@ public class EightOffController {
      * Configura eventos para una celda libre
      */
     private void configurarFreeCell(StackPane freeCell, int indice) {
-        // Iniciar arrastre desde celda libre
         freeCell.setOnDragDetected(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
             Carta carta = juegoEightOff.getTopFreeCell(indice);
             if (carta != null) {
                 Dragboard db = freeCell.startDragAndDrop(TransferMode.MOVE);
@@ -198,6 +454,11 @@ public class EightOffController {
         });
 
         freeCell.setOnDragOver(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
             if (e.getDragboard().hasString() && !e.getDragboard().getString().startsWith("freecell")) {
                 e.acceptTransferModes(TransferMode.MOVE);
             }
@@ -205,6 +466,12 @@ public class EightOffController {
         });
 
         freeCell.setOnDragDropped(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.setDropCompleted(false);
+                e.consume();
+                return;
+            }
+
             Dragboard db = e.getDragboard();
             boolean exito = false;
 
@@ -232,14 +499,41 @@ public class EightOffController {
      * Configura eventos para una columna del tableau
      */
     private void configurarColumna(VBox columna, int indice) {
+        columna.setOnDragDetected(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+            if (!juegoEightOff.getTableauObject(indice).estaVacia()) {
+                Dragboard db = columna.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString("columna-" + indice);
+                db.setContent(content);
+                e.consume();
+            }
+        });
 
         columna.setOnDragOver(e -> {
-            if (e.getDragboard().hasString()) e.acceptTransferModes(TransferMode.MOVE);
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
+            if (e.getDragboard().hasString()) {
+                e.acceptTransferModes(TransferMode.MOVE);
+            }
             e.consume();
         });
 
         columna.setOnDragEntered(e -> {
-            if (e.getDragboard().hasString()) columna.setEffect(new Glow(0.3));
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
+            if (e.getDragboard().hasString()) {
+                columna.setEffect(new Glow(0.3));
+            }
             e.consume();
         });
 
@@ -249,6 +543,12 @@ public class EightOffController {
         });
 
         columna.setOnDragDropped(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.setDropCompleted(false);
+                e.consume();
+                return;
+            }
+
             Dragboard db = e.getDragboard();
             boolean exito = false;
 
@@ -281,14 +581,43 @@ public class EightOffController {
      * Configura eventos para una fundación
      */
     private void configurarFundacion(StackPane fundacion, int indice) {
+        fundacion.setOnDragDetected(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
+            Carta carta = juegoEightOff.getTopFoundation(indice);
+            if (carta != null) {
+                Dragboard db = fundacion.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString("foundation-" + indice);
+                db.setContent(content);
+                e.consume();
+            }
+        });
 
         fundacion.setOnDragOver(e -> {
-            if (e.getDragboard().hasString()) e.acceptTransferModes(TransferMode.MOVE);
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
+            if (e.getDragboard().hasString()) {
+                e.acceptTransferModes(TransferMode.MOVE);
+            }
             e.consume();
         });
 
         fundacion.setOnDragEntered(e -> {
-            if (e.getDragboard().hasString()) fundacion.setEffect(new Glow(0.5));
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.consume();
+                return;
+            }
+
+            if (e.getDragboard().hasString()) {
+                fundacion.setEffect(new Glow(0.5));
+            }
             e.consume();
         });
 
@@ -298,6 +627,12 @@ public class EightOffController {
         });
 
         fundacion.setOnDragDropped(e -> {
+            if (juegoEightOff.getHistorial().isModoHistorial()) {
+                e.setDropCompleted(false);
+                e.consume();
+                return;
+            }
+
             Dragboard db = e.getDragboard();
             boolean exito = false;
 
@@ -321,28 +656,42 @@ public class EightOffController {
             e.setDropCompleted(exito);
             e.consume();
         });
-
-        fundacion.setOnDragDetected(e -> {
-            Carta carta = juegoEightOff.getTopFoundation(indice);
-            if (carta != null) {
-                Dragboard db = fundacion.startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                content.putString("foundation-" + indice);
-                db.setContent(content);
-                e.consume();
-            }
-        });
     }
+
+    /**
+     * Deshabilita todos los controles de juego cuando está en modo historial
+     */
+    private void actualizarEstadoControles() {
+        boolean modoHistorial = juegoEightOff.getHistorial().isModoHistorial();
+
+        btnPista.setDisable(modoHistorial);
+        btnUndo.setDisable(modoHistorial);
+        if (modoHistorial) {
+            lblEstado.setText("Modo historial - Solo visualización");
+            lblEstado.setStyle("-fx-text-fill: #FFA500; -fx-font-weight: bold;");
+        }
+    }
+
 
     /**
      * Actualiza toda la interfaz gráfica
      */
     private void actualizarInterfaz() {
+        if (juegoTerminado) return;
+
         actualizarColumnas();
         actualizarFreeCells();
         actualizarFundaciones();
-        verificarEstadoJuego();
+        actualizarEstadoControles();
+
+        if (juegoEightOff.getHistorial().isModoHistorial()) {
+            resaltarMovimientoActual();
+        } else {
+            limpiarResaltados();
+            verificarEstadoJuego();
+        }
     }
+
 
     /**
      * Actualiza las columnas del tableau
@@ -405,7 +754,6 @@ public class EightOffController {
      * Crea una etiqueta visual para representar una carta
      */
     private Label crearEtiquetaCarta(Carta carta) {
-        // Convertir valor numérico a símbolo
         String valor;
         switch (carta.getValor()) {
             case 1: valor = "A"; break;
@@ -448,47 +796,112 @@ public class EightOffController {
      * Verifica el estado del juego (victoria o sin movimientos)
      */
     private void verificarEstadoJuego() {
+        if (juegoTerminado) return;
+
         if (juegoEightOff.evaluarVictoria()) {
-            verificarVictoria();
+            mostrarVentanaVictoria();
         } else if (!juegoEightOff.hayMovimientosDisponibles()) {
-            lblEstado.setText("¡Sin movimientos! Juego terminado.");
-            lblEstado.setStyle("-fx-text-fill: #FF6B6B; -fx-font-weight: bold;");
+            mostrarVentanaSinMovimientos();
         }
     }
 
     /**
      * Muestra pantalla de victoria cuando el juego es ganado
      */
-    private void verificarVictoria() {
+    private void mostrarVentanaVictoria() {
+        if (juegoTerminado) return;
+        juegoTerminado = true;
+
         lblEstado.setText("¡Felicidades! ¡Has ganado!");
         lblEstado.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 18px;");
 
         try {
-
+            Stage ventanaVictoria = new Stage(StageStyle.UNDECORATED);
+            ventanaVictoria.initModality(Modality.APPLICATION_MODAL);
             Image imagenVictoria = new Image(getClass().getResourceAsStream("/imagenes/victoria.png"));
             ImageView imageView = new ImageView(imagenVictoria);
-            imageView.setFitWidth(500);
             imageView.setPreserveRatio(true);
+            imageView.setFitHeight(400);
 
-            VBox layout = new VBox(20);
-            layout.setStyle("-fx-background-color: rgba(0,0,0,0.8); -fx-alignment: center; -fx-padding: 40px;");
-            layout.getChildren().add(imageView);
+            Label mensaje = new Label(" ¡HAS GANADO! ");
+            mensaje.setStyle("-fx-text-fill: white; -fx-font-size: 64px; -fx-font-weight: bold;");
 
-            Button cerrarBtn = new Button("Cerrar");
-            cerrarBtn.setStyle("-fx-font-size: 16px; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-            cerrarBtn.setOnAction(e -> ((Stage) cerrarBtn.getScene().getWindow()).close());
+            Button cerrarBtn = new Button("Salir del juego");
+            cerrarBtn.setStyle("-fx-font-size: 24px; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+            cerrarBtn.setOnAction(e -> {
+                try {
+                    ventanaVictoria.close();
 
-            layout.getChildren().add(cerrarBtn);
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/interfaz/pantallaInicio.fxml"));
+                    Parent root = loader.load();
 
-            Stage ventanaVictoria = new Stage();
-            ventanaVictoria.setTitle("¡Victoria!");
-            ventanaVictoria.setScene(new Scene(layout));
-            ventanaVictoria.setResizable(false);
-            ventanaVictoria.initModality(Modality.APPLICATION_MODAL);
+                    Stage stage = (Stage) lblEstado.getScene().getWindow();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.show();
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            VBox layout = new VBox(40);
+            layout.setStyle("-fx-background-color: black; -fx-alignment: center;");
+            layout.getChildren().addAll(imageView, mensaje, cerrarBtn);
+
+            Scene escena = new Scene(layout);
+            ventanaVictoria.setScene(escena);
+            ventanaVictoria.setFullScreen(true);
             ventanaVictoria.show();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Muestra pantalla cuando el jugador se queda sin movimientos
+     */
+
+    private void mostrarVentanaSinMovimientos() {
+        if (juegoTerminado) return;
+        juegoTerminado = true;
+
+        lblEstado.setText("¡Sin movimientos! Juego terminado.");
+        lblEstado.setStyle("-fx-text-fill: #FF6B6B; -fx-font-weight: bold;");
+
+        Stage ventanaFin = new Stage(StageStyle.DECORATED);
+        ventanaFin.initModality(Modality.WINDOW_MODAL);
+
+        VBox layout = new VBox(20);
+        layout.setStyle("-fx-background-color: black; -fx-alignment: center; -fx-padding: 30;");
+
+        Label mensaje = new Label("¡NO QUEDAN MOVIMIENTOS!");
+        mensaje.setStyle("-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;");
+
+        Button cerrarBtn = new Button("Regresar al menú");
+        cerrarBtn.setStyle("-fx-font-size: 18px; -fx-background-color: #FF6B6B; -fx-text-fill: white;");
+        cerrarBtn.setOnAction(e -> {
+            try {
+                ventanaFin.close();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/interfaz/pantallaInicio.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) lblEstado.getScene().getWindow();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        layout.getChildren().addAll(mensaje, cerrarBtn);
+
+        Scene escena = new Scene(layout, 500, 250);
+        ventanaFin.setScene(escena);
+        ventanaFin.setResizable(false);
+        ventanaFin.show();
     }
 }

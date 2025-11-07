@@ -1,11 +1,12 @@
 package Juego;
 
 import Cartas.Carta;
+import Listas.ListaSimple;
 
 public class EstadoJuego {
 
     // Tipos de movimientos posibles en el juego
-    public enum Tipo {TT, TF, FT, FF, TC, CT, CF, FC}
+    public enum Tipo {TT, TF, FT, TC, CT, CF, FC}
 
     // Orígenes y destinos posibles para los movimientos
     public enum OrigenDestino {TABLEAU, FOUNDATION, FREE_CELL}
@@ -115,16 +116,87 @@ public class EstadoJuego {
     public Tipo getTipo() { return tipo; }
     public int getFromIdx() { return fromIdx; }
     public int getToIdx() { return toIdx; }
-    public int getCantidad() { return cantidad; }
+    public Carta getCarta() {
+        return carta;
+    }
+
+    /**
+     * Ejecuta este movimiento en el juego
+     */
+    public void ejecutar(EightOff juego) {
+        switch (tipo) {
+            case TT -> {
+                ListaSimple<Carta> pack = juego.getTableauObject(fromIdx).popN(cantidad);
+                juego.getTableauObject(toIdx).pushEscalera(pack);
+            }
+            case TC -> {
+                Carta c = juego.getTableauObject(fromIdx).pop();
+                juego.getFreeCellObject(toIdx).agregarCarta(c);
+            }
+            case CT -> {
+                Carta c = juego.getFreeCellObject(fromIdx).sacarCarta(0);
+                juego.getTableauObject(toIdx).push(c);
+            }
+            case TF -> {
+                Carta c = juego.getTableauObject(fromIdx).pop();
+                juego.foundations[toIdx].agregarCarta(c);
+            }
+            case CF -> {
+                Carta c = juego.getFreeCellObject(fromIdx).sacarCarta(0);
+                juego.foundations[toIdx].agregarCarta(c);
+            }
+            case FT -> {
+                Carta c = juego.foundations[fromIdx].sacarCarta();
+                juego.getTableauObject(toIdx).push(c);
+            }
+            case FC -> {
+                Carta c = juego.foundations[fromIdx].sacarCarta();
+                juego.getFreeCellObject(toIdx).agregarCarta(c);
+            }
+        }
+    }
+
+    /**
+     * Revierte este movimiento en el juego
+     */
+    public void revertir(EightOff juego) {
+        switch (tipo) {
+            case TT -> {
+                ListaSimple<Carta> pack = juego.getTableauObject(toIdx).popN(cantidad);
+                juego.getTableauObject(fromIdx).pushAllInicial(pack);
+            }
+            case TC -> {
+                Carta c = juego.getFreeCellObject(toIdx).sacarCarta(0);
+                juego.getTableauObject(fromIdx).pushInicial(c);
+            }
+            case CT -> {
+                Carta c = juego.getTableauObject(toIdx).pop();
+                juego.getFreeCellObject(fromIdx).agregarCarta(c);
+            }
+            case TF -> {
+                Carta c = juego.foundations[toIdx].sacarCarta();
+                juego.getTableauObject(fromIdx).pushInicial(c);
+            }
+            case CF -> {
+                Carta c = juego.foundations[toIdx].sacarCarta();
+                juego.getFreeCellObject(fromIdx).agregarCarta(c);
+            }
+            case FT -> {
+                Carta c = juego.getTableauObject(toIdx).pop();
+                juego.foundations[fromIdx].agregarCarta(c);
+            }
+            case FC -> {
+                Carta c = juego.getFreeCellObject(toIdx).sacarCarta(0);
+                juego.foundations[fromIdx].agregarCarta(c);
+            }
+        }
+    }
 
     /**
      * Representación en texto del movimiento para debugging
      */
     @Override
     public String toString() {
-        String fromStr = from.toString() + "[" + fromIdx + "]";
-        String toStr = to.toString() + "[" + toIdx + "]";
-
         switch (tipo) {
             case TT:
                 return String.format("Tableau[%d] -> Tableau[%d]: %s (cantidad: %d)",
@@ -134,9 +206,6 @@ public class EstadoJuego {
                         fromIdx, toIdx, carta);
             case FT:
                 return String.format("Foundation[%d] -> Tableau[%d]: %s",
-                        fromIdx, toIdx, carta);
-            case FF:
-                return String.format("Foundation[%d] -> Foundation[%d]: %s",
                         fromIdx, toIdx, carta);
             case TC:
                 return String.format("Tableau[%d] -> FreeCell[%d]: %s",
@@ -151,7 +220,7 @@ public class EstadoJuego {
                 return String.format("Foundation[%d] -> FreeCell[%d]: %s",
                         fromIdx, toIdx, carta);
             default:
-                return "Movimiento desconocido: " + fromStr + " -> " + toStr;
+                return "Movimiento desconocido";
         }
     }
 }

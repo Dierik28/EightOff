@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         try {
             Font.loadFont(getClass().getResourceAsStream("/fonts/ITCBenguiatStdBookCnIt.OTF"), 50);
             Parent root = FXMLLoader.load(getClass().getResource("/interfaz/pantallaInicio.fxml"));
